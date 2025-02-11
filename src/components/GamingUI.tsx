@@ -43,6 +43,7 @@ const GamingUI = () => {
       toast.error("Minimum amount is 10");
       return;
     }
+    toast.error("Ruk ja bhosdike abhi sabar rakh");
     closeModal();
     console.log("Amount:", amount, "selectItem", selectItem);
   };
