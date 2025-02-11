@@ -3,7 +3,7 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 import GameHistory from "./history/GameHistory";
 import Chart from "./history/Chart";
 import MyHistory from "./history/MyHistory";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaIndianRupeeSign } from "react-icons/fa6";
 import { FaCheckCircle } from "react-icons/fa";
 import toast from "react-hot-toast";
@@ -16,6 +16,8 @@ const GamingUI = () => {
   const [isAgree, setIsAgree] = useState(true);
   const [isAmountSelect, setIsAmountSelect] = useState(10);
   const [multiples, setMultiples] = useState(0);
+  const [time, setTime] = useState(30); // Set initial countdown time in seconds (3 minutes)
+  const [selectedTime, setSelectedTime] = useState(30);
   const onChange = (item: any) => {
     setSelectItem(item);
     setIsOpen(true);
@@ -34,6 +36,31 @@ const GamingUI = () => {
     setIsAmountSelect(10);
     closeModal();
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
+      if (time === 0) {
+        setTime(selectedTime);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [time, setTime]);
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+
+    return {
+      m1: Math.floor(minutes / 10),
+      m2: minutes % 10,
+      s1: Math.floor(seconds / 10),
+      s2: seconds % 10,
+    };
+  };
+
+  const { m1, m2, s1, s2 } = formatTime(time);
   const handleSendData = async () => {
     if (!isAgree) {
       toast.error("Please agree to the terms and conditions.");
@@ -73,22 +100,42 @@ const GamingUI = () => {
         </div>
       </div>
       <section className="flex gap-2 mt-3 bg-white p-2 w-full rounded-2xl justify-between">
-        <div className="flex flex-col items-center hover:bg-red-500 transition-all duration-200 hover:text-white hover:cursor-pointer p-2 rounded-xl">
+        <div
+          className={`flex flex-col items-center hover:bg-red-500 transition-all duration-200 hover:text-white hover:cursor-pointer p-2 rounded-xl ${
+            selectedTime === 30 && "bg-red-500"
+          }`}
+          onClick={() => setSelectedTime(30)}
+        >
           <FaClock size={30} color="gray" />
           <p>Win Go</p>
           <p>30s</p>
         </div>
-        <div className="flex flex-col items-center hover:bg-red-500 transition-all duration-200 hover:text-white hover:cursor-pointer p-2 rounded-xl">
+        <div
+          className={`flex flex-col items-center hover:bg-red-500 transition-all duration-200 hover:text-white hover:cursor-pointer p-2 rounded-xl ${
+            selectedTime === 60 && "bg-red-500 text-white"
+          }`}
+          onClick={() => setSelectedTime(60)}
+        >
           <FaClock size={30} color="gray" />
           <p>Win Go</p>
           <p>1Min</p>
         </div>
-        <div className="flex flex-col items-center hover:bg-red-500 transition-all duration-200 hover:text-white hover:cursor-pointer p-2 rounded-xl">
+        <div
+          className={`flex flex-col items-center hover:bg-red-500 ${
+            selectedTime === 180 && "bg-red-500"
+          } transition-all duration-200 hover:text-white hover:cursor-pointer p-2 rounded-xl`}
+          onClick={() => setSelectedTime(180)}
+        >
           <FaClock size={30} color="gray" />
           <p>Win Go</p>
           <p>3Min</p>
         </div>
-        <div className="flex flex-col items-center hover:bg-red-500 transition-all duration-200 hover:text-white hover:cursor-pointer p-2 rounded-xl">
+        <div
+          className={`flex flex-col items-center hover:bg-red-500 transition-all duration-200 hover:text-white hover:cursor-pointer p-2 rounded-xl ${
+            selectedTime === 300 && "bg-red-500"
+          }`}
+          onClick={() => setSelectedTime(300)}
+        >
           <FaClock size={30} color="gray" />
           <p>Win Go</p>
           <p>5Min</p>
@@ -109,10 +156,20 @@ const GamingUI = () => {
             <p>8</p>
           </div>
         </div>
-        <div>
-          <p className="text-white">Timer remaining</p>
-          <p className="text-white">04:12</p>
-          <p className="text-white">{"201254521263662"}</p>
+        <div className="flex flex-col">
+          <p className="text-white font-semibold text-sm text-right pr-2">
+            Time Remaining
+          </p>
+          <div className="flex justify-center items-center gap-1 mt-1">
+            <div className="box">{m1}</div>
+            <div className="box">{m2}</div>
+            <div className="box2">:</div>
+            <div className="box">{s1}</div>
+            <div className="box">{s2}</div>
+          </div>
+          <p className="text-white font-semibold text-sm tracking-wider mt-3">
+            {"201254521263662"}
+          </p>
         </div>
       </section>
       <section className="flex gap-2 mt-3 bg-gray-400 p-5 rounded-2xl w-full flex-col">
@@ -228,6 +285,19 @@ const GamingUI = () => {
                       +
                     </button>
                   </div>
+                </div>
+                <div className="flex gap-5 justify-end mt-3">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className={`bg-gray-600 hover:cursor-pointer rounded-xl hover:bg-green-500 transition py-2 px-3 text-white font-semibold ${
+                        multiples === index + 1 ? "bg-green-500" : ""
+                      }`}
+                      onClick={() => setMultiples(index + 1)}
+                    >
+                      <p>{index + 1 + "x"}</p>
+                    </div>
+                  ))}
                 </div>
                 <div
                   className="flex items-center gap-2 cursor-pointer"
